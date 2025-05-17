@@ -29,15 +29,10 @@ struct GetMovieListUseCaseTest {
     mutating func getMoviesWithInvalidCategory() async {
         let category = "invalid"
         let input = GetMovieListUseCaseInput(category: category)
-        var receivedError: Error?
 
-        do {
-            _ = try await sut.execute(input: input)
-        } catch {
-            receivedError = error
+        await #expect(throws: MovieError.invalidCategory) {
+            try await sut.execute(input: input)
         }
-
-        #expect(receivedError as? MovieError == .invalidCategory)
     }
 }
 
