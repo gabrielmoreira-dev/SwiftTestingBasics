@@ -1,7 +1,7 @@
 import Testing
 @testable import SwiftTestingBasics
 
-final class GetMovieListUseCaseTest {
+struct GetMovieListUseCaseTest {
     private lazy var repository: MovieRepositoryStub = {
         MovieRepositoryStub()
     }()
@@ -14,9 +14,10 @@ final class GetMovieListUseCaseTest {
         "Given category is Comedy, when execute, then return movies",
         arguments: ["COMEDY", "DRAMA", "DOCUMENTARY"]
     )
-    func getComedyMovies(category: String) async throws {
+    mutating func getComedyMovies(category: String) async throws {
         let input = GetMovieListUseCaseInput(category: category)
-        let movies = [Movie(name: "Movie 1", category: .comedy)]
+        let category = try #require(Category(rawValue: category))
+        let movies = [Movie(name: "Movie 1", category: category)]
         repository.movies = movies
 
         let result = try await sut.execute(input: input)
@@ -25,7 +26,7 @@ final class GetMovieListUseCaseTest {
     }
 
     @Test("Given category is invalid, when execute, then throw error")
-    func getMoviesWithInvalidCategory() async {
+    mutating func getMoviesWithInvalidCategory() async {
         let category = "invalid"
         let input = GetMovieListUseCaseInput(category: category)
         var receivedError: Error?
